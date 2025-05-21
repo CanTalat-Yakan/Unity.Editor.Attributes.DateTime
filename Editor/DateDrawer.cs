@@ -7,7 +7,6 @@ namespace UnityEssentials
     [CustomPropertyDrawer(typeof(DateAttribute))]
     public class DateDrawer : PropertyDrawer
     {
-
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType != SerializedPropertyType.Vector3)
@@ -19,16 +18,15 @@ namespace UnityEssentials
             EditorGUI.BeginProperty(position, label, property);
 
             // Get current values from Vector3
-            Vector3 vectorValue = property.vector3Value;
+            var vectorValue = property.vector3Value;
             var dateContainer = new DateContainer
             {
-                // Correct mapping: x=month, y=day, z=year
-                Month = (Month)(vectorValue.x),
-                Day = (Day)(vectorValue.y),
-                Year = (Year)(vectorValue.z)
+                Day = (Day)(vectorValue.x == 0 ? 1 : vectorValue.x),
+                Month = (Month)(vectorValue.y == 0 ? 1 : vectorValue.y),
+                Year = (Year)(vectorValue.z == 0 ? 1 : vectorValue.z)
             };
 
-            Rect contentPosition = EditorGUI.PrefixLabel(position, label);
+            var contentPosition = EditorGUI.PrefixLabel(position, label);
             int indentLevel = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
@@ -39,25 +37,22 @@ namespace UnityEssentials
             float lineHeight = EditorGUIUtility.singleLineHeight;
             float fieldXPosition = 20 + labelWidth;
 
-            // Month field (M)
-            EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "M");
-            dateContainer.Month = (Month)EditorGUI.EnumPopup(
-                new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight),
-                dateContainer.Month);
-            fieldXPosition += fieldWidth + 20;
-
             // Day field (D)
             EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "D");
-            dateContainer.Day = (Day)EditorGUI.EnumPopup(
-                new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight),
-                dateContainer.Day);
+            var dayPosition = new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight);
+            dateContainer.Day = (Day)EditorGUI.EnumPopup(dayPosition, dateContainer.Day);
+            fieldXPosition += fieldWidth + 20;
+
+            // Month field (M)
+            EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "M");
+            var monthPosition = new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight);
+            dateContainer.Month = (Month)EditorGUI.EnumPopup(monthPosition, dateContainer.Month);
             fieldXPosition += fieldWidth + 20;
 
             // Year field (Y)
             EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "Y");
-            dateContainer.Year = (Year)EditorGUI.EnumPopup(
-                new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight),
-                dateContainer.Year);
+            var yearPosition = new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight);
+            dateContainer.Year = (Year)EditorGUI.EnumPopup(yearPosition, dateContainer.Year);
 
             // Validate day based on month and year
             int yearInt = GetYearFromEnum(dateContainer.Year);
@@ -65,16 +60,12 @@ namespace UnityEssentials
             int currentDay = (int)dateContainer.Day;
 
             if (currentDay > maxDay)
-            {
                 dateContainer.Day = (Day)maxDay;
-            }
 
-            // Save back to Vector3 with correct mapping
             property.vector3Value = new Vector3(
-                (float)dateContainer.Month,
                 (float)dateContainer.Day,
-                (float)dateContainer.Year
-            );
+                (float)dateContainer.Month,
+                (float)dateContainer.Year);
 
             EditorGUI.indentLevel = indentLevel;
             EditorGUI.EndProperty();
@@ -105,6 +96,14 @@ namespace UnityEssentials
         }
     }
 
+    [System.Serializable]
+    public struct DateContainer
+    {
+        public Month Month;
+        public Day Day;
+        public Year Year;
+    }
+
     public enum Month { Jan = 1, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec }
     public enum Day { D1 = 1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, D17, D18, D19, D20, D21, D22, D23, D24, D25, D26, D27, D28, D29, D30, D31 }
     public enum Year
@@ -130,14 +129,6 @@ namespace UnityEssentials
         Y1920, Y1919, Y1918, Y1917, Y1916, Y1915, Y1914, Y1913, Y1912, Y1911,
         Y1910, Y1909, Y1908, Y1907, Y1906, Y1905, Y1904, Y1903, Y1902, Y1901,
         Y1900
-    }
-
-    [System.Serializable]
-    public struct DateContainer
-    {
-        public Month Month;
-        public Day Day;
-        public Year Year;
     }
 }
 #endif
