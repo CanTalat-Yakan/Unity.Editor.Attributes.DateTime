@@ -8,6 +8,12 @@ namespace UnityEssentials
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (property.propertyType != SerializedPropertyType.Boolean)
+            {
+                EditorGUI.HelpBox(position, "DateAttribute attribute only supports Vector3 fields.", MessageType.Error);
+                return;
+            }
+
             EditorGUI.BeginProperty(position, label, property);
 
             Rect contentPosition = EditorGUI.PrefixLabel(position, label);
