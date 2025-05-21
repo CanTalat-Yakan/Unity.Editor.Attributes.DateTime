@@ -10,7 +10,7 @@ namespace UnityEssentials
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType == SerializedPropertyType.Vector3Int)
+            if (property.propertyType != SerializedPropertyType.Vector3Int && property.propertyType != SerializedPropertyType.Float)
             {
                 EditorGUI.HelpBox(position, "TimeAttribute only supports Vector3Int or float fields.", MessageType.Error);
                 return;
