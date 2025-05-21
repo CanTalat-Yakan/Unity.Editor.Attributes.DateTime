@@ -75,7 +75,6 @@ namespace UnityEssentials
         private void UpdatePropertyVector(SerializedProperty property, TimeContainer timeContainer)
         {
             property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)timeContainer.Minute, (int)timeContainer.Second);
-
             property.serializedObject.ApplyModifiedProperties();
         }
 
@@ -84,7 +83,6 @@ namespace UnityEssentials
             float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
 
             property.floatValue = Mathf.Clamp(newValue, 0f, 23.999722f);
-
             property.serializedObject.ApplyModifiedProperties();
         }
     }
