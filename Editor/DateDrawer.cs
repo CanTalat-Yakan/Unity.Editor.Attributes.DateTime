@@ -24,7 +24,7 @@ namespace UnityEssentials
             {
                 Day = (Day)(vectorValue.x == 0 ? 1 : vectorValue.x),
                 Month = (Month)(vectorValue.y == 0 ? 1 : vectorValue.y),
-                Year = (Year)(vectorValue.z == 0 ? 1 : vectorValue.z)
+                Year = (Year)(vectorValue.z == 0 ? 75 : vectorValue.z)
             };
 
             var contentPosition = EditorGUI.PrefixLabel(position, label);
@@ -62,8 +62,6 @@ namespace UnityEssentials
                 (int)dateContainer.Year);
 
             property.serializedObject.ApplyModifiedProperties();
-
-            Debug.Log(dateContainer);
         }
 
         private int GetYearFromEnum(Year YearEnum)
@@ -126,7 +124,7 @@ namespace UnityEssentials
     public enum Day { _1 = 1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31 }
     public enum Year
     {
-        _2100 = 1, _2099, _2098, _2097, _2096, _2095, _2094, _2093, _2092, _2091,
+        _2100, _2099, _2098, _2097, _2096, _2095, _2094, _2093, _2092, _2091,
         _2090, _2089, _2088, _2087, _2086, _2085, _2084, _2083, _2082, _2081,
         _2080, _2079, _2078, _2077, _2076, _2075, _2074, _2073, _2072, _2071,
         _2070, _2069, _2068, _2067, _2066, _2065, _2064, _2063, _2062, _2061,
