@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,10 +41,15 @@ namespace UnityEssentials
             // Day field (D)
             EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "D");
             var dayPosition = new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight);
-            dateContainer.Day = (Day)EditorGUI.EnumPopup(dayPosition, dateContainer.Day);
+            //dateContainer.Day = (Day)EditorGUI.EnumPopup(dayPosition, dateContainer.Day);
             fieldXPosition += fieldWidth + 20;
 
+            //var enumNames = Enum.GetNames(typeof(Day));
+            //if (EditorGUI.DropdownButton(dayPosition, new GUIContent(dateContainer.Day.ToString()), FocusType.Keyboard))
+            //    EnumSearchPopup.Show(dayPosition, property.serializedObject.targetObject, property.propertyPath, typeof(Day), dateContainer.Day, enumNames);
+
             // Month field (M)
+
             EditorGUI.LabelField(new Rect(fieldXPosition, position.y, fieldWidth, lineHeight), "M");
             var monthPosition = new Rect(fieldXPosition + spacing, position.y, fieldWidth, lineHeight);
             dateContainer.Month = (Month)EditorGUI.EnumPopup(monthPosition, dateContainer.Month);

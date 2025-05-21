@@ -2,7 +2,8 @@
     "name": "UnityEssentials.DateTimeAttribute.Editor",
     "rootNamespace": "UnityEssentials",
     "references": [
-        "GUID:6820a47831dd8c440847367a2ba0a6b4"
+        "GUID:6820a47831dd8c440847367a2ba0a6b4",
+        "GUID:0dd1051ff66652e4ea56f73784c825e0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
