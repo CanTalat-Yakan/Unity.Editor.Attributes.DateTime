@@ -1,0 +1,16 @@
+{
+    "name": "UnityEssentials.DateTimeAttribute.Editor",
+    "rootNamespace": "UnityEssentials",
+    "references": [
+        "GUID:6820a47831dd8c440847367a2ba0a6b4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
