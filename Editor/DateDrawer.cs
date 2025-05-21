@@ -114,14 +114,22 @@ namespace UnityEssentials
             return this;
         }
 
-        public override string ToString()
-        {
-            return $"{Day} {Month} {Year}";
-        }
+        public override string ToString() =>
+            $"{Day} {Month} {Year}";
     }
 
-    public enum Month { January = 1, Febuary, March, April, May, June, July, August, September, October, November, December }
-    public enum Day { _1 = 1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31 }
+    public enum Month
+    {
+        January = 1, Febuary, March, April, May, June,
+        July, August, September, October, November, December
+    }
+
+    public enum Day
+    {
+        _1 = 1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, 
+        _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31
+    }
+
     public enum Year
     {
         _2100, _2099, _2098, _2097, _2096, _2095, _2094, _2093, _2092, _2091,

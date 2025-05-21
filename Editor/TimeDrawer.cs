@@ -10,6 +10,12 @@ namespace UnityEssentials
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (property.propertyType == SerializedPropertyType.Vector3Int)
+            {
+                EditorGUI.HelpBox(position, "TimeAttribute only supports Vector3Int or float fields.", MessageType.Error);
+                return;
+            }
+
             EditorGUI.BeginProperty(position, label, property);
 
             float labelWidth = EditorGUIUtility.labelWidth;
@@ -36,20 +42,9 @@ namespace UnityEssentials
 
                 EditorGUI.PrefixLabel(position, label);
 
-                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => {
-                    property.vector3IntValue = new Vector3Int((int)newHour, (int)timeContainer.Minute, (int)timeContainer.Second);
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-
-                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => {
-                    property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)newMinute, (int)timeContainer.Second);
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-
-                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => {
-                    property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)timeContainer.Minute, (int)newSecond);
-                    property.serializedObject.ApplyModifiedProperties();
-                });
+                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => UpdatePropertyVector(property, timeContainer.UpdateHour(newHour)));
+                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => UpdatePropertyVector(property, timeContainer.UpdateMinute(newMinute)));
+                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => UpdatePropertyVector(property, timeContainer.UpdateSecond(newSecond)));
             }
             else if (property.propertyType == SerializedPropertyType.Float)
             {
@@ -69,30 +64,28 @@ namespace UnityEssentials
 
                 EditorGUI.PrefixLabel(position, label);
 
-                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => {
-                    float newVal = ((int)newHour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
-                    property.floatValue = Mathf.Clamp(newVal, 0f, 23.999722f); // max is 23h 59m 59s
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-
-                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => {
-                    float newVal = ((int)timeContainer.Hour) + ((int)newMinute / 60f) + ((int)timeContainer.Second / 3600f);
-                    property.floatValue = Mathf.Clamp(newVal, 0f, 23.999722f);
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-
-                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => {
-                    float newVal = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)newSecond / 3600f);
-                    property.floatValue = Mathf.Clamp(newVal, 0f, 23.999722f);
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-            }
-            else
-            {
-                EditorGUI.HelpBox(position, "TimeAttribute only supports Vector3Int or float fields.", MessageType.Error);
+                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => UpdatePropertyFloat(property, timeContainer.UpdateHour(newHour)));
+                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => UpdatePropertyFloat(property, timeContainer.UpdateMinute(newMinute)));
+                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => UpdatePropertyFloat(property, timeContainer.UpdateSecond(newSecond)));
             }
 
             EditorGUI.EndProperty();
+        }
+
+        private void UpdatePropertyVector(SerializedProperty property, TimeContainer timeContainer)
+        {
+            property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)timeContainer.Minute, (int)timeContainer.Second);
+
+            property.serializedObject.ApplyModifiedProperties();
+        }
+
+        private void UpdatePropertyFloat(SerializedProperty property, TimeContainer timeContainer)
+        {
+            float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
+
+            property.floatValue = Mathf.Clamp(newValue, 0f, 23.999722f);
+
+            property.serializedObject.ApplyModifiedProperties();
         }
     }
 
@@ -103,16 +96,32 @@ namespace UnityEssentials
         public Minute Minute;
         public Second Second;
 
-        public override string ToString()
+        public TimeContainer UpdateHour(Hour newHour)
         {
-            return $"{Hour:D2}:{Minute:D2}:{Second:D2}";
+            Hour = newHour;
+            return this;
         }
+
+        public TimeContainer UpdateMinute(Minute newMinute)
+        {
+            Minute = newMinute;
+            return this;
+        }
+
+        public TimeContainer UpdateSecond(Second newSecond)
+        {
+            Second = newSecond;
+            return this;
+        }
+
+        public override string ToString() =>
+            $"{Hour:D2}:{Minute:D2}:{Second:D2}";
     }
 
     public enum Hour
     {
-        _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11,
-        _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23
+        _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12,
+        _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23
     }
 
     public enum Minute
