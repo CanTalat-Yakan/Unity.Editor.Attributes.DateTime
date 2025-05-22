@@ -37,13 +37,13 @@ namespace UnityEssentials
             float lineHeight = EditorGUIUtility.singleLineHeight;
             float fieldXPosition = 18 + labelWidth;
 
-            var dayPosition = new Rect(fieldXPosition, position.y, fieldWidth, lineHeight);
-            var monthPosition = new Rect(dayPosition.x + fieldWidth, position.y, fieldWidth, lineHeight);
-            var yearPositon = new Rect(monthPosition.x + fieldWidth, position.y, fieldWidth, lineHeight);
+            var yearPositon = new Rect(fieldXPosition, position.y, fieldWidth, lineHeight);
+            var monthPosition = new Rect(yearPositon.x + fieldWidth, position.y, fieldWidth, lineHeight);
+            var dayPosition = new Rect(monthPosition.x + fieldWidth, position.y, fieldWidth, lineHeight);
 
-            EnumDrawer.EnumPopup<Day>(dayPosition, dateContainer.Day, (newDay) => UpdateProperty(property, dateContainer.UpdateDay(newDay)));
-            EnumDrawer.EnumPopup<Month>(monthPosition, dateContainer.Month, (newMonth) => UpdateProperty(property, dateContainer.UpdateMonth(newMonth)));
             EnumDrawer.EnumPopup<Year>(yearPositon, dateContainer.Year, (newYear) => UpdateProperty(property, dateContainer.UpdateYear(newYear)));
+            EnumDrawer.EnumPopup<Month>(monthPosition, dateContainer.Month, (newMonth) => UpdateProperty(property, dateContainer.UpdateMonth(newMonth)));
+            EnumDrawer.EnumPopup<Day>(dayPosition, dateContainer.Day, (newDay) => UpdateProperty(property, dateContainer.UpdateDay(newDay)));
 
             EditorGUI.indentLevel = indentLevel;
             EditorGUI.EndProperty();
@@ -96,9 +96,9 @@ namespace UnityEssentials
         public Day Day;
         public Year Year;
 
-        public DateContainer UpdateDay(Day newDay)
+        public DateContainer UpdateYear(Year newYear)
         {
-            Day = newDay;
+            Year = newYear;
             return this;
         }
 
@@ -108,9 +108,9 @@ namespace UnityEssentials
             return this;
         }
 
-        public DateContainer UpdateYear(Year newYear)
+        public DateContainer UpdateDay(Day newDay)
         {
-            Year = newYear;
+            Day = newDay;
             return this;
         }
 
