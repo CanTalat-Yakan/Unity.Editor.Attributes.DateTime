@@ -23,10 +23,6 @@ namespace UnityEssentials
         /// hours, minutes, and seconds, respectively. For <see cref="SerializedPropertyType.Float"/>, the value is
         /// interpreted as a fraction of a day, where 23.999722f represents 24 hours.  If the property type is unsupported, an
         /// error message is displayed instead of the custom GUI.</remarks>
-        /// <param name="position">The rectangle on the screen to use for the property GUI.</param>
-        /// <param name="property">The serialized property to make the custom GUI for. Must be of type <see
-        /// cref="SerializedPropertyType.Vector3Int"/> or <see cref="SerializedPropertyType.Float"/>.</param>
-        /// <param name="label">The label of the property being drawn.</param>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType != SerializedPropertyType.Vector3Int && property.propertyType != SerializedPropertyType.Float)
