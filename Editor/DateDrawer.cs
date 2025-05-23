@@ -5,9 +5,28 @@ using UnityEngine;
 
 namespace UnityEssentials
 {
+    /// <summary>
+    /// A custom property drawer for fields marked with the <see cref="DateAttribute"/> attribute.
+    /// </summary>
+    /// <remarks>This drawer is designed to work with fields of type <see cref="Vector3Int"/> in Unity's
+    /// serialized objects. The <see cref="Vector3Int"/> is interpreted as a date, where the X, Y, and Z components
+    /// represent the day, month, and year, respectively.</remarks>
     [CustomPropertyDrawer(typeof(DateAttribute))]
     public class DateDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// Draws a custom GUI for a <see cref="SerializedProperty"/> of type <see
+        /// cref="SerializedPropertyType.Vector3Int"/> that represents a date using day, month, and year components.
+        /// </summary>
+        /// <remarks>This method renders a custom editor field for a <see cref="Vector3Int"/> property,
+        /// interpreting its components as a date: <list type="bullet"> <item><description><c>x</c>: Represents the
+        /// day.</description></item> <item><description><c>y</c>: Represents the month.</description></item>
+        /// <item><description><c>z</c>: Represents the year.</description></item> </list> If the property is not of
+        /// type <see cref="SerializedPropertyType.Vector3Int"/>, an error message is displayed instead.</remarks>
+        /// <param name="position">The rectangle on the screen to use for the property GUI.</param>
+        /// <param name="property">The serialized property to make the custom GUI for. Must be of type <see
+        /// cref="SerializedPropertyType.Vector3Int"/>.</param>
+        /// <param name="label">The label to display next to the property field in the Inspector.</param>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType != SerializedPropertyType.Vector3Int)
@@ -49,6 +68,15 @@ namespace UnityEssentials
             EditorGUI.EndProperty();
         }
 
+        /// <summary>
+        /// Updates the specified serialized property with the values from the provided <see cref="DateContainer"/>.
+        /// </summary>
+        /// <remarks>The method ensures that the day value in the <paramref name="dateContainer"/> does
+        /// not exceed the maximum valid day  for the given month and year before updating the property. The updated
+        /// values are applied to the serialized object.</remarks>
+        /// <param name="property">The serialized property to update. This property must support a <see cref="Vector3Int"/> value.</param>
+        /// <param name="dateContainer">A container holding the day, month, and year values to be applied to the property.  If the day value exceeds
+        /// the maximum valid day for the specified month and year, it will be adjusted to the maximum valid day.</param>
         private void UpdateProperty(SerializedProperty property, DateContainer dateContainer)
         {
             int yearInt = GetYearFromEnum(dateContainer.Year);
@@ -64,12 +92,26 @@ namespace UnityEssentials
             property.serializedObject.ApplyModifiedProperties();
         }
 
+        /// <summary>
+        /// Extracts the year value from the specified <see cref="Year"/> enumeration.
+        /// </summary>
+        /// <param name="YearEnum">An enumeration value representing a year, where the year is encoded as a string prefixed with a character.</param>
+        /// <returns>The numeric year extracted from the <paramref name="YearEnum"/> value.</returns>
         private int GetYearFromEnum(Year YearEnum)
         {
             string yearString = YearEnum.ToString().Substring(1);
             return int.Parse(yearString);
         }
 
+        /// <summary>
+        /// Determines the maximum number of days in the specified month and year.
+        /// </summary>
+        /// <remarks>For February, the method accounts for leap years based on the provided <paramref
+        /// name="year"/>.</remarks>
+        /// <param name="month">The month for which to determine the maximum number of days.</param>
+        /// <param name="year">The year to consider when determining the number of days in February. This is used to account for leap
+        /// years.</param>
+        /// <returns>The maximum number of days in the specified month and year.</returns>
         private int GetMaxDay(Month month, int year) =>
             month switch
             {
@@ -79,6 +121,13 @@ namespace UnityEssentials
                 _ => 31,
             };
 
+        /// <summary>
+        /// Determines whether the specified year is a leap year.
+        /// </summary>
+        /// <remarks>A leap year is a year that is divisible by 4, but not divisible by 100, unless it is
+        /// also divisible by 400.</remarks>
+        /// <param name="year">The year to evaluate. Must be a positive integer.</param>
+        /// <returns><see langword="true"/> if the specified year is a leap year; otherwise, <see langword="false"/>.</returns>
         private bool IsLeapYear(int year)
         {
             if (year % 4 != 0)

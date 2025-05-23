@@ -5,9 +5,28 @@ using UnityEngine;
 
 namespace UnityEssentials
 {
+    /// <summary>
+    /// Provides a custom property drawer for fields marked with the <see cref="TimeAttribute"/> attribute.
+    /// </summary>
+    /// <remarks>This drawer supports fields of type <see cref="SerializedPropertyType.Vector3Int"/> and  <see
+    /// cref="SerializedPropertyType.Float"/>. It displays the time as separate hour, minute, and second fields in the
+    /// Unity Inspector, allowing users to edit time values in a structured format.</remarks>
     [CustomPropertyDrawer(typeof(TimeAttribute))]
     public class TimeDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// Draws a custom GUI for properties with a <see cref="TimeAttribute"/> applied, supporting fields of type <see
+        /// cref="SerializedPropertyType.Vector3Int"/> or <see cref="SerializedPropertyType.Float"/>.
+        /// </summary>
+        /// <remarks>This method renders a time picker interface, allowing users to edit hours, minutes,
+        /// and seconds.  For <see cref="SerializedPropertyType.Vector3Int"/>, the X, Y, and Z components represent
+        /// hours, minutes, and seconds, respectively. For <see cref="SerializedPropertyType.Float"/>, the value is
+        /// interpreted as a fraction of a day, where 23.999722f represents 24 hours.  If the property type is unsupported, an
+        /// error message is displayed instead of the custom GUI.</remarks>
+        /// <param name="position">The rectangle on the screen to use for the property GUI.</param>
+        /// <param name="property">The serialized property to make the custom GUI for. Must be of type <see
+        /// cref="SerializedPropertyType.Vector3Int"/> or <see cref="SerializedPropertyType.Float"/>.</param>
+        /// <param name="label">The label of the property being drawn.</param>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType != SerializedPropertyType.Vector3Int && property.propertyType != SerializedPropertyType.Float)
@@ -72,12 +91,32 @@ namespace UnityEssentials
             EditorGUI.EndProperty();
         }
 
+        /// <summary>
+        /// Updates the specified serialized property with the time values from the provided <see
+        /// cref="TimeContainer"/>.
+        /// </summary>
+        /// <remarks>The <paramref name="property"/> is updated with the hour, minute, and second values
+        /// from the <paramref name="timeContainer"/> as a <see cref="Vector3Int"/>. The changes are applied to the
+        /// serialized object after the update.</remarks>
+        /// <param name="property">The serialized property to update. Must represent a <see cref="Vector3Int"/> value.</param>
+        /// <param name="timeContainer">The <see cref="TimeContainer"/> containing the hour, minute, and second values to set.</param>
         private void UpdatePropertyVector(SerializedProperty property, TimeContainer timeContainer)
         {
             property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)timeContainer.Minute, (int)timeContainer.Second);
             property.serializedObject.ApplyModifiedProperties();
         }
 
+        /// <summary>
+        /// Updates the specified serialized property with a float value representing the time contained in the provided
+        /// <see cref="TimeContainer"/>.
+        /// </summary>
+        /// <remarks>The float value is calculated as the sum of the hour, the minute divided by 60, and
+        /// the second divided by 3600. The resulting value is clamped to ensure it remains within the valid range for a
+        /// 24-hour time format.</remarks>
+        /// <param name="property">The serialized property to update. The property's value will be set to a float representing the time in
+        /// hours, clamped between 0 and 23.999722.</param>
+        /// <param name="timeContainer">The <see cref="TimeContainer"/> instance containing the hour, minute, and second values used to calculate
+        /// the property's new float value.</param>
         private void UpdatePropertyFloat(SerializedProperty property, TimeContainer timeContainer)
         {
             float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
