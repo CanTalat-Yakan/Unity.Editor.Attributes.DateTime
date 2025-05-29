@@ -14,6 +14,11 @@ namespace UnityEssentials
     [CustomPropertyDrawer(typeof(TimeAttribute))]
     public class TimeDrawer : PropertyDrawer
     {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            // Two lines: enums + slider, plus spacing
+            return EditorGUIUtility.singleLineHeight * 2 + EditorGUIUtility.standardVerticalSpacing;
+        }
         /// <summary>
         /// Draws a custom GUI for properties with a <see cref="TimeAttribute"/> applied, supporting fields of type <see
         /// cref="SerializedPropertyType.Vector3Int"/> or <see cref="SerializedPropertyType.Float"/>.
@@ -25,100 +30,53 @@ namespace UnityEssentials
         /// error message is displayed instead of the custom GUI.</remarks>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType != SerializedPropertyType.Vector3Int && property.propertyType != SerializedPropertyType.Float)
+            if (property.propertyType != SerializedPropertyType.Float)
             {
-                EditorGUI.HelpBox(position, "TimeAttribute only supports Vector3Int or float fields.", MessageType.Error);
+                EditorGUI.HelpBox(position, "TimeAttribute only supports float fields.", MessageType.Error);
                 return;
             }
 
             EditorGUI.BeginProperty(position, label, property);
 
-            float labelWidth = EditorGUIUtility.labelWidth;
-            float valueAreaWidth = position.width - labelWidth - 1;
-            float fieldWidth = valueAreaWidth / 3f;
-            float lineHeight = EditorGUIUtility.singleLineHeight;
-            float fieldXPosition = 18 + labelWidth;
+            var labelWidth = EditorGUIUtility.labelWidth;
+            var valueAreaWidth = position.width - labelWidth - 1;
+            var fieldWidth = valueAreaWidth / 3f;
+            var lineHeight = EditorGUIUtility.singleLineHeight;
+            var spacing = EditorGUIUtility.standardVerticalSpacing;
 
-            var hourPosition = new Rect(fieldXPosition, position.y, fieldWidth, lineHeight);
-            var minutePosition = new Rect(hourPosition.x + fieldWidth, position.y, fieldWidth, lineHeight);
-            var secondPosition = new Rect(minutePosition.x + fieldWidth, position.y, fieldWidth, lineHeight);
+            var enumRect = new Rect(position.x, position.y, position.width, lineHeight);
+            var fieldXPosition = 18 + labelWidth;
+            var hourPosition = new Rect(fieldXPosition, enumRect.y, fieldWidth, lineHeight);
+            var minutePosition = new Rect(hourPosition.x + fieldWidth, enumRect.y, fieldWidth, lineHeight);
+            var secondPosition = new Rect(minutePosition.x + fieldWidth, enumRect.y, fieldWidth, lineHeight);
 
-            TimeContainer timeContainer;
+            var floatValue = property.floatValue;
+            var totalSeconds = Mathf.Clamp(Mathf.FloorToInt(floatValue * 3600), 0, 86399);
 
-            if (property.propertyType == SerializedPropertyType.Vector3Int)
+            EditorGUI.PrefixLabel(position, label);
+
+            TimeContainer timeContainer = new TimeContainer
             {
-                var vectorValue = property.vector3IntValue;
-                timeContainer = new TimeContainer
-                {
-                    Hour = (Hour)Mathf.Clamp(vectorValue.x, 0, 23),
-                    Minute = (Minute)Mathf.Clamp(vectorValue.y, 0, 59),
-                    Second = (Second)Mathf.Clamp(vectorValue.z, 0, 59)
-                };
-
-                EditorGUI.PrefixLabel(position, label);
-
-                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => UpdatePropertyVector(property, timeContainer.UpdateHour(newHour)));
-                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => UpdatePropertyVector(property, timeContainer.UpdateMinute(newMinute)));
-                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => UpdatePropertyVector(property, timeContainer.UpdateSecond(newSecond)));
-            }
-            else if (property.propertyType == SerializedPropertyType.Float)
+                Hour = (Hour)(totalSeconds / 3600),
+                Minute = (Minute)((totalSeconds % 3600) / 60),
+                Second = (Second)(totalSeconds % 60)
+            };
+            void UpdatePropertyFloat(SerializedProperty property, TimeContainer timeContainer)
             {
-                float floatValue = property.floatValue;
-                int totalSeconds = Mathf.Clamp(Mathf.FloorToInt(floatValue * 3600), 0, 86399);
+                float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
 
-                int hour = totalSeconds / 3600;
-                int minute = (totalSeconds % 3600) / 60;
-                int second = totalSeconds % 60;
-
-                timeContainer = new TimeContainer
-                {
-                    Hour = (Hour)hour,
-                    Minute = (Minute)minute,
-                    Second = (Second)second
-                };
-
-                EditorGUI.PrefixLabel(position, label);
-
-                EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => UpdatePropertyFloat(property, timeContainer.UpdateHour(newHour)));
-                EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => UpdatePropertyFloat(property, timeContainer.UpdateMinute(newMinute)));
-                EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => UpdatePropertyFloat(property, timeContainer.UpdateSecond(newSecond)));
+                property.floatValue = Mathf.Clamp(newValue, 0f, 24f);
+                property.serializedObject.ApplyModifiedProperties();
             }
+            EnumDrawer.EnumPopup<Hour>(hourPosition, timeContainer.Hour, (newHour) => UpdatePropertyFloat(property, timeContainer.UpdateHour(newHour)));
+            EnumDrawer.EnumPopup<Minute>(minutePosition, timeContainer.Minute, (newMinute) => UpdatePropertyFloat(property, timeContainer.UpdateMinute(newMinute)));
+            EnumDrawer.EnumPopup<Second>(secondPosition, timeContainer.Second, (newSecond) => UpdatePropertyFloat(property, timeContainer.UpdateSecond(newSecond)));
+
+            var sliderRect = new Rect(position.x + labelWidth, position.y + lineHeight + spacing, position.width - labelWidth - 3, lineHeight);
+            property.floatValue = EditorGUI.Slider(sliderRect, GUIContent.none, property.floatValue, 0f, 24f);
+            property.serializedObject.ApplyModifiedProperties();
 
             EditorGUI.EndProperty();
-        }
-
-        /// <summary>
-        /// Updates the specified serialized property with the time values from the provided <see
-        /// cref="TimeContainer"/>.
-        /// </summary>
-        /// <remarks>The <paramref name="property"/> is updated with the hour, minute, and second values
-        /// from the <paramref name="timeContainer"/> as a <see cref="Vector3Int"/>. The changes are applied to the
-        /// serialized object after the update.</remarks>
-        /// <param name="property">The serialized property to update. Must represent a <see cref="Vector3Int"/> value.</param>
-        /// <param name="timeContainer">The <see cref="TimeContainer"/> containing the hour, minute, and second values to set.</param>
-        private void UpdatePropertyVector(SerializedProperty property, TimeContainer timeContainer)
-        {
-            property.vector3IntValue = new Vector3Int((int)timeContainer.Hour, (int)timeContainer.Minute, (int)timeContainer.Second);
-            property.serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary>
-        /// Updates the specified serialized property with a float value representing the time contained in the provided
-        /// <see cref="TimeContainer"/>.
-        /// </summary>
-        /// <remarks>The float value is calculated as the sum of the hour, the minute divided by 60, and
-        /// the second divided by 3600. The resulting value is clamped to ensure it remains within the valid range for a
-        /// 24-hour time format.</remarks>
-        /// <param name="property">The serialized property to update. The property's value will be set to a float representing the time in
-        /// hours, clamped between 0 and 23.999722.</param>
-        /// <param name="timeContainer">The <see cref="TimeContainer"/> instance containing the hour, minute, and second values used to calculate
-        /// the property's new float value.</param>
-        private void UpdatePropertyFloat(SerializedProperty property, TimeContainer timeContainer)
-        {
-            float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
-
-            property.floatValue = Mathf.Clamp(newValue, 0f, 23.999722f);
-            property.serializedObject.ApplyModifiedProperties();
         }
     }
 
