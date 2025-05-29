@@ -35,9 +35,9 @@ namespace UnityEssentials
             var vectorValue = property.vector3IntValue;
             var dateContainer = new DateContainer
             {
-                Day = (Day)(vectorValue.x == 0 ? 1 : vectorValue.x),
+                Year = (Year)(vectorValue.x == 0 ? 75 : vectorValue.x),
                 Month = (Month)(vectorValue.y == 0 ? 1 : vectorValue.y),
-                Year = (Year)(vectorValue.z == 0 ? 75 : vectorValue.z)
+                Day = (Day)(vectorValue.z == 0 ? 1 : vectorValue.z)
             };
 
             var contentPosition = EditorGUI.PrefixLabel(position, label);
@@ -79,9 +79,9 @@ namespace UnityEssentials
                 dateContainer.Day = (Day)maxDay;
 
             property.vector3IntValue = new Vector3Int(
-                (int)dateContainer.Day,
+                (int)dateContainer.Year,
                 (int)dateContainer.Month,
-                (int)dateContainer.Year);
+                (int)dateContainer.Day);
 
             property.serializedObject.ApplyModifiedProperties();
         }
