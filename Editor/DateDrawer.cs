@@ -31,7 +31,6 @@ namespace UnityEssentials
 
             EditorGUI.BeginProperty(position, label, property);
 
-            // Get current values from Vector3Int
             var vectorValue = property.vector3IntValue;
             var dateContainer = new DateContainer
             {

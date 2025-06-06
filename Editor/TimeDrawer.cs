@@ -61,6 +61,7 @@ namespace UnityEssentials
                 Minute = (Minute)((totalSeconds % 3600) / 60),
                 Second = (Second)(totalSeconds % 60)
             };
+
             void UpdatePropertyFloat(SerializedProperty property, TimeContainer timeContainer)
             {
                 float newValue = ((int)timeContainer.Hour) + ((int)timeContainer.Minute / 60f) + ((int)timeContainer.Second / 3600f);
