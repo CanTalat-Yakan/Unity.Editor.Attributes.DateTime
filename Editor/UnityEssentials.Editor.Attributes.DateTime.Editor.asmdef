@@ -1,5 +1,5 @@
 {
-    "name": "UnityEssentials.DateTimeAttribute.Editor",
+    "name": "UnityEssentials.Editor.Attributes.DateTime.Editor",
     "rootNamespace": "UnityEssentials",
     "references": [
         "GUID:0dd1051ff66652e4ea56f73784c825e0",
